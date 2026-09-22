@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import ImpactSection from '../../components/ImpactSection.astro';
+import HowIWorkSection from '../../components/HowIWorkSection.astro';
+import StackSection from '../../components/StackSection.astro';
+import ExperienceSection from '../../components/ExperienceSection.astro';
+import EducationSection from '../../components/EducationSection.astro';
+import { getProfile } from '../../i18n/content';
+
+const locale = 'es' as const;
+const profile = await getProfile(locale);
+---
+
+<BaseLayout locale={locale} title={`${profile.name} — Software Engineer`} description={profile.positioning}>
+  <Hero locale={locale} />
+  <ImpactSection locale={locale} />
+  <HowIWorkSection locale={locale} />
+  <StackSection locale={locale} />
+  <ExperienceSection locale={locale} />
+  <EducationSection locale={locale} />
+</BaseLayout>

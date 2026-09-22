@@ -1,0 +1,10 @@
+[
+  {
+    "locale": "es",
+    "name": "AWS Certified Cloud Practitioner",
+    "issuer": "Amazon Web Services",
+    "date": "2023-09",
+    "order": 1,
+    "id": "aws-ccp"
+  }
+]

@@ -1,0 +1,130 @@
+---
+import type { Locale } from '../i18n/content';
+import { getExperience } from '../i18n/content';
+import { t } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const experiences = await getExperience(locale);
+const strings = t(locale);
+
+function formatDate(value: string) {
+  const [year, month] = value.split('-');
+  const date = new Date(Number(year), Number(month) - 1);
+  return date.toLocaleDateString(locale === 'es' ? 'es' : 'en', { year: 'numeric', month: 'short' });
+}
+---
+
+<section id="experience" class="experience" data-reveal>
+  <div class="container">
+    <h2 class="section-label">{strings.sections.experience}</h2>
+    <hr class="hairline experience__rule" />
+
+    <div class="experience__list">
+      {experiences.map((exp) => (
+        <article class="experience__item">
+          <div class="experience__dates">
+            {formatDate(exp.startDate)} — {exp.endDate ? formatDate(exp.endDate) : strings.present}
+          </div>
+          <div class="experience__body">
+            <h3 class="experience__role">
+              {exp.role} <span class="experience__company">· {exp.company}</span>
+            </h3>
+            <p class="experience__description">{exp.description}</p>
+            <ul class="experience__stack">
+              {exp.stack.map((tech) => (
+                <li>{tech}</li>
+              ))}
+            </ul>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .experience {
+    padding-block: var(--space-16);
+  }
+
+  .experience__rule {
+    margin-block: var(--space-3) var(--space-12);
+  }
+
+  .experience__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  .experience__item {
+    display: grid;
+    grid-template-columns: 13.5rem 1fr;
+    gap: var(--space-6);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-rule);
+  }
+
+  .experience__item:last-child {
+    border-bottom: none;
+  }
+
+  .experience__dates {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-ink-dim);
+    padding-top: 0.2rem;
+    white-space: nowrap;
+  }
+
+  .experience__role {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-3);
+  }
+
+  .experience__company {
+    font-weight: 400;
+    color: var(--color-ink-dim);
+  }
+
+  .experience__description {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-4);
+    max-width: 40rem;
+  }
+
+  .experience__stack {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .experience__stack li {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-ink-dim);
+    border: 1px solid var(--color-rule);
+    border-radius: 2px;
+    padding: 0.15em 0.6em;
+  }
+
+  @media (max-width: 640px) {
+    .experience__item {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+  }
+</style>

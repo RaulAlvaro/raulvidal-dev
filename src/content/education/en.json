@@ -1,0 +1,20 @@
+[
+  {
+    "locale": "en",
+    "institution": "Instituto Politécnico Nacional (IPN), Mexico City",
+    "program": "Student exchange, Computer Systems Engineering",
+    "startDate": "2019-07",
+    "endDate": "2019-12",
+    "order": 2,
+    "id": "ipn"
+  },
+  {
+    "locale": "en",
+    "institution": "Universidad Nacional Mayor de San Marcos (UNMSM), Lima, Peru",
+    "program": "Bachelor's in Software Engineering",
+    "startDate": "2015-01",
+    "endDate": "2020-07",
+    "order": 1,
+    "id": "unmsm"
+  }
+]

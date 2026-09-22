@@ -1,0 +1,42 @@
+[
+  {
+    "locale": "es",
+    "id": "plan-review-execute",
+    "experienceId": "relink",
+    "title": "Plan-Review-Execute con Claude Code",
+    "problem": "Velocidad de entrega individual limitada por el ciclo manual de código.",
+    "decision": "Implementé un workflow de orquestación con IA (planificar → revisar → ejecutar) como capa de productividad central, no como novedad.",
+    "result": "Consolidó un método de trabajo real y repetible — el diferenciador 'reciente' que pocos candidatos tienen consolidado.",
+    "order": 4
+  },
+  {
+    "locale": "es",
+    "id": "relink-magic-links",
+    "experienceId": "relink",
+    "title": "Autenticación Magic Links (JWT)",
+    "problem": "Fricción de login para usuarios enterprise.",
+    "decision": "Diseñé e implementé autenticación sin password vía JWT.",
+    "result": "En producción para 11,500+ usuarios enterprise.",
+    "order": 2
+  },
+  {
+    "locale": "es",
+    "id": "relink-supervisor-tier",
+    "experienceId": "relink",
+    "title": "Nuevo tier de usuario supervisor",
+    "problem": "La plataforma no tenía un modelo de validación intermedia entre usuario final y admin.",
+    "decision": "Diseñé y shippeé un nuevo tier de usuario 'supervisor' de punta a punta.",
+    "result": "Impulsó adopción de prueba en 15 nuevas cuentas enterprise y onboardeó 2,000+ usuarios al nuevo modelo de roles.",
+    "order": 1
+  },
+  {
+    "locale": "es",
+    "id": "relink-v2-hexagonal",
+    "experienceId": "continuum-hq",
+    "title": "Migración a arquitectura hexagonal (Relink v2)",
+    "problem": "El dominio de negocio estaba acoplado a Strapi como infraestructura, dificultando cambios.",
+    "decision": "Lideré la migración progresiva a clean/hexagonal architecture para desacoplar dominio de infraestructura, sumando Pub/Sub + Cloud Run para escalabilidad.",
+    "result": "Desacopló la lógica de dominio de la infraestructura, permitiendo cambios sin tocar la capa de framework.",
+    "order": 3
+  }
+]

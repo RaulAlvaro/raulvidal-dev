@@ -1,0 +1,99 @@
+---
+import type { Locale } from '../i18n/content';
+import { getTechStack } from '../i18n/content';
+import { t } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const items = await getTechStack(locale);
+const strings = t(locale);
+
+const categories = ['core', 'infrastructure', 'cloud', 'as-needed'] as const;
+const grouped = categories.map((category) => ({
+  category,
+  ...strings.stackGroups[category],
+  items: items.filter((item) => item.category === category),
+}));
+---
+
+<section id="stack" class="stack" data-reveal>
+  <div class="container">
+    <h2 class="section-label">{strings.sections.stack}</h2>
+    <hr class="hairline stack__rule" />
+
+    <div class="stack__groups">
+      {grouped.map((group) => (
+        <div class="stack__group">
+          <div class="stack__group-header">
+            <p class="stack__group-label">{group.label}</p>
+            {group.note && <p class="stack__group-note">{group.note}</p>}
+          </div>
+          <ul class="stack__items">
+            {group.items.map((item) => (
+              <li class="stack__item">{item.name}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .stack {
+    padding-block: var(--space-16);
+  }
+
+  .stack__rule {
+    margin-block: var(--space-3) var(--space-12);
+  }
+
+  .stack__groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-12) var(--space-8);
+  }
+
+  .stack__group-header {
+    border-bottom: 1px solid var(--color-rule);
+    padding-bottom: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .stack__group-label {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    margin: 0;
+  }
+
+  .stack__group-note {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    color: var(--color-ink-dim);
+    margin: var(--space-1) 0 0;
+  }
+
+  .stack__items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .stack__item {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-ink);
+    border: 1px solid var(--color-rule);
+    border-radius: 2px;
+    padding: 0.3em 0.7em;
+  }
+</style>

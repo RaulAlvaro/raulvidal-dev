@@ -1,0 +1,146 @@
+---
+import type { Locale } from '../i18n/content';
+import { getEducation, getCertifications, getProfile } from '../i18n/content';
+import { t } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const education = await getEducation(locale);
+const certifications = await getCertifications(locale);
+const profile = await getProfile(locale);
+const strings = t(locale);
+
+function formatDate(value: string) {
+  const [year, month] = value.split('-');
+  const date = new Date(Number(year), Number(month) - 1);
+  return date.toLocaleDateString(locale === 'es' ? 'es' : 'en', { year: 'numeric', month: 'short' });
+}
+---
+
+<section id="education" class="education" data-reveal>
+  <div class="container">
+    <h2 class="section-label">{strings.sections.education}</h2>
+    <hr class="hairline education__rule" />
+
+    <div class="education__list">
+      {education.map((entry) => (
+        <div class="education__item">
+          <div class="education__dates">
+            {formatDate(entry.startDate)} — {formatDate(entry.endDate)}
+          </div>
+          <div>
+            <h3 class="education__program">{entry.program}</h3>
+            <p class="education__institution">{entry.institution}</p>
+          </div>
+        </div>
+      ))}
+      {certifications.map((cert) => (
+        <div class="education__item">
+          <div class="education__dates">{formatDate(cert.date)}</div>
+          <div>
+            <h3 class="education__program">{cert.name}</h3>
+            <p class="education__institution">{cert.issuer}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <p class="education__languages-label">{strings.languages}</p>
+    <ul class="education__languages">
+      {profile.languages.map((lang) => (
+        <li>
+          <span class="education__language-name">{lang.name}</span>
+          <span class="education__language-level">{lang.level}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .education {
+    padding-block: var(--space-16);
+  }
+
+  .education__rule {
+    margin-block: var(--space-3) var(--space-12);
+  }
+
+  .education__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .education__item {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: var(--space-6);
+  }
+
+  .education__dates {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-ink-dim);
+    padding-top: 0.2rem;
+    white-space: nowrap;
+  }
+
+  .education__program {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-1);
+  }
+
+  .education__institution {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-ink-dim);
+    margin: 0;
+  }
+
+  .education__languages-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin: var(--space-12) 0 var(--space-4);
+  }
+
+  .education__languages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .education__languages li {
+    display: flex;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+  }
+
+  .education__language-name {
+    color: var(--color-ink);
+  }
+
+  .education__language-level {
+    color: var(--color-ink-dim);
+  }
+
+  @media (max-width: 640px) {
+    .education__item {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+    }
+  }
+</style>

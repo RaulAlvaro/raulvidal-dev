@@ -1,0 +1,234 @@
+---
+import type { Locale } from '../i18n/content';
+import { t } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale);
+---
+
+<div class="terminal" data-terminal>
+  <div class="terminal__titlebar">
+    <span class="terminal__dot terminal__dot--red" aria-hidden="true"></span>
+    <span class="terminal__dot terminal__dot--yellow" aria-hidden="true"></span>
+    <span class="terminal__dot terminal__dot--green" aria-hidden="true"></span>
+  </div>
+  <div class="terminal__body" data-terminal-body>
+    <p class="terminal__line terminal__line--hint">{strings.terminal.helpHint}</p>
+  </div>
+  <div class="terminal__input-row">
+    <span class="terminal__prompt" aria-hidden="true">$</span>
+    <input
+      type="text"
+      class="terminal__input"
+      data-terminal-input
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      aria-label="Terminal command input"
+    />
+  </div>
+</div>
+
+<script define:vars={{ locale, strings: t(locale).terminal }}>
+  const root = document.currentScript.previousElementSibling;
+  const body = root.querySelector('[data-terminal-body]');
+  const input = root.querySelector('[data-terminal-input]');
+
+  function fmt(template, replacements) {
+    return template.replace(/\{(\w+)\}/g, (_, key) => replacements[key] ?? '');
+  }
+
+  function appendLine(text, variant) {
+    const p = document.createElement('p');
+    p.className = 'terminal__line' + (variant ? ` terminal__line--${variant}` : '');
+    p.textContent = text;
+    body.appendChild(p);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function appendCommandEcho(cmd) {
+    const p = document.createElement('p');
+    p.className = 'terminal__line terminal__line--echo';
+    p.textContent = `$ ${cmd}`;
+    body.appendChild(p);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function runCommand(raw) {
+    const cmd = raw.trim();
+    if (!cmd) return;
+    appendCommandEcho(cmd);
+
+    const [name, ...args] = cmd.split(/\s+/);
+    const lower = name.toLowerCase();
+
+    switch (lower) {
+      case 'help':
+        strings.help.forEach((line) => appendLine(line));
+        break;
+      case 'whoami':
+        strings.whoami.forEach((line) => appendLine(line));
+        break;
+      case 'git':
+        if (args[0] === 'log') {
+          strings.gitLog.forEach((line) => appendLine(line));
+        } else {
+          appendLine(fmt(strings.commandNotFound, { cmd }));
+        }
+        break;
+      case 'contact':
+        strings.contact.forEach((line) => appendLine(line, 'accent'));
+        break;
+      case 'sudo':
+        appendLine(strings.sudo);
+        break;
+      case 'lang': {
+        const target = (args[0] || '').toLowerCase();
+        if (target === 'en' || target === 'es') {
+          appendLine(fmt(strings.langSwitching, { lang: target }));
+          setTimeout(() => {
+            const path = target === 'en' ? '/' : '/es/';
+            window.location.href = path;
+          }, 500);
+        } else if (!target) {
+          appendLine(strings.langUsage);
+        } else {
+          appendLine(fmt(strings.langUnknown, { lang: target }));
+        }
+        break;
+      }
+      case 'theme': {
+        const target = (args[0] || '').toLowerCase();
+        if (target === 'light' || target === 'dark') {
+          window.__theme?.apply(target);
+          appendLine(fmt(strings.themeSwitched, { theme: target }));
+        } else if (!target) {
+          appendLine(fmt(strings.themeCurrent, { theme: window.__theme?.current() ?? 'dark' }));
+        } else {
+          appendLine(fmt(strings.themeUnknown, { theme: target }));
+        }
+        break;
+      }
+      case 'clear':
+        clearTerminal();
+        break;
+      default:
+        appendLine(fmt(strings.commandNotFound, { cmd }));
+    }
+  }
+
+  function clearTerminal() {
+    body.innerHTML = '';
+  }
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      runCommand(input.value);
+      input.value = '';
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
+      e.preventDefault();
+      clearTerminal();
+    }
+  });
+
+  root.addEventListener('click', () => input.focus());
+</script>
+
+<style>
+  .terminal {
+    width: 100%;
+    max-width: 40rem;
+    background: var(--color-bg-raised);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+  }
+
+  .terminal__titlebar {
+    display: flex;
+    gap: 0.5rem;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-rule);
+  }
+
+  .terminal__dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--color-ink-faint);
+  }
+
+  .terminal__dot--red {
+    background: #ff5f57;
+  }
+
+  .terminal__dot--yellow {
+    background: #febc2e;
+  }
+
+  .terminal__dot--green {
+    background: #28c840;
+  }
+
+  .terminal__body {
+    padding: var(--space-4);
+    height: 18rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .terminal__line {
+    margin: 0;
+    min-width: 0;
+    color: var(--color-ink);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .terminal__line--hint {
+    color: var(--color-ink-dim);
+  }
+
+  .terminal__line--echo {
+    color: var(--color-accent);
+  }
+
+  .terminal__line--accent {
+    color: var(--color-accent);
+  }
+
+  .terminal__input-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .terminal__prompt {
+    color: var(--color-accent);
+  }
+
+  .terminal__input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    outline: none;
+  }
+</style>

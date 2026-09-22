@@ -1,0 +1,136 @@
+---
+import type { Locale } from '../i18n/content';
+import { getImpactCases, getExperience } from '../i18n/content';
+import { t } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const cases = await getImpactCases(locale);
+const experiences = await getExperience(locale);
+const strings = t(locale);
+
+const experienceById = new Map(experiences.map((e) => [e.id, e]));
+---
+
+<section id="impact" class="impact" data-reveal>
+  <div class="container">
+    <h2 class="section-label">{strings.sections.impact}</h2>
+    <hr class="hairline impact__rule" />
+
+    <div class="impact__list">
+      {cases.map((item, index) => {
+        const exp = experienceById.get(item.experienceId);
+        const caseNumber = String(index + 1).padStart(2, '0');
+        return (
+          <article class="impact__case">
+            <div class="impact__case-header">
+              <span class="impact__case-id">{strings.caseLabel}-{caseNumber}</span>
+              <span aria-hidden="true">·</span>
+              <span class="impact__case-company">{exp?.company}</span>
+              <span aria-hidden="true">·</span>
+              <span class="impact__case-status status-badge">{strings.statusShipped}</span>
+            </div>
+            <h3 class="impact__case-title">{item.title}</h3>
+            <dl class="impact__case-body">
+              <div class="impact__case-row">
+                <dt>{strings.problem}</dt>
+                <dd>{item.problem}</dd>
+              </div>
+              <div class="impact__case-row">
+                <dt>{strings.decision}</dt>
+                <dd>{item.decision}</dd>
+              </div>
+              <div class="impact__case-row">
+                <dt>{strings.result}</dt>
+                <dd>{item.result}</dd>
+              </div>
+            </dl>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<style>
+  .impact {
+    padding-block: var(--space-24) var(--space-16);
+  }
+
+  .impact__rule {
+    margin-block: var(--space-3) var(--space-12);
+  }
+
+  .impact__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+  }
+
+  .impact__case-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-ink-dim);
+    margin-bottom: var(--space-3);
+  }
+
+  .impact__case-id {
+    color: var(--color-ink);
+    font-weight: 700;
+  }
+
+  .impact__case-status {
+    margin-left: var(--space-2);
+  }
+
+  .impact__case-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    line-height: 1.2;
+    margin: 0 0 var(--space-6);
+    color: var(--color-ink);
+  }
+
+  .impact__case-body {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    max-width: 48rem;
+  }
+
+  .impact__case-row {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: var(--space-4);
+  }
+
+  .impact__case-row dt {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .impact__case-row dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--color-ink);
+  }
+
+  @media (max-width: 640px) {
+    .impact__case-row {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+    }
+  }
+</style>

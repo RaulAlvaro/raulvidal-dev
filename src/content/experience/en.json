@@ -1,0 +1,77 @@
+[
+  {
+    "locale": "en",
+    "id": "aynitech",
+    "company": "Aynitech Group",
+    "role": "Full Stack Developer",
+    "startDate": "2020-01",
+    "endDate": "2021-06",
+    "remote": true,
+    "description": "Legacy serverless backend re-architecture to domain-driven NestJS; eCommerce with Stripe; SaaS ERP.",
+    "stack": [
+      "Node.js",
+      "NestJS",
+      "Stripe",
+      "Serverless"
+    ],
+    "order": 3
+  },
+  {
+    "locale": "en",
+    "id": "continuum-hq",
+    "company": "Continuum HQ",
+    "role": "Full Stack Developer | Tech Lead",
+    "startDate": "2021-07",
+    "endDate": "2024-12",
+    "remote": true,
+    "description": "4 projects: Relink v1, MatchSkills (Tech Lead, small team), Relink v2 (hexagonal migration), Clínica Alemana de Chile (telemedicine).",
+    "stack": [
+      "Node.js",
+      "TypeScript",
+      "Vue 2",
+      "React",
+      "PostgreSQL",
+      "Redis",
+      "Elasticsearch",
+      "GCP Pub/Sub",
+      "Cloud Run"
+    ],
+    "order": 2
+  },
+  {
+    "locale": "en",
+    "id": "prodequa",
+    "company": "Prodequa / Freelance",
+    "role": "Full Stack Developer",
+    "startDate": "2019-01",
+    "endDate": "2019-12",
+    "remote": true,
+    "description": "5+ web apps and CMS for Peruvian companies, deployed on Digital Ocean.",
+    "stack": [
+      "JavaScript",
+      "Node.js",
+      "Digital Ocean"
+    ],
+    "order": 4
+  },
+  {
+    "locale": "en",
+    "id": "relink",
+    "company": "Relink",
+    "role": "Software Engineer",
+    "startDate": "2025-01",
+    "endDate": "2026-07",
+    "remote": true,
+    "description": "Worked across 3 fronts of the product simultaneously (core Relink, Hazlo con IA, Despega tu Pega). Stack: Node.js, TypeScript, Strapi, Go (Gin/Gorm), Vue 3, PostgreSQL, GitHub Actions.",
+    "stack": [
+      "Node.js",
+      "TypeScript",
+      "Strapi",
+      "Go",
+      "Vue 3",
+      "PostgreSQL",
+      "GitHub Actions"
+    ],
+    "order": 1
+  }
+]

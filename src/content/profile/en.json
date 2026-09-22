@@ -1,0 +1,25 @@
+[
+  {
+    "locale": "en",
+    "name": "Raul Alvaro Vidal Trujillo",
+    "headline": "Software Engineer with real product ownership.",
+    "positioning": "Software Engineer who owns products end-to-end — from architecture decisions to shipped impact, not someone executing tickets inside a fixed stack.",
+    "location": "Lima, Peru",
+    "remote": true,
+    "email": "raul.vidal.trujillo@gmail.com",
+    "phone": "+51 940 093 382",
+    "linkedin": "https://linkedin.com/in/raul-vidal-trujillo",
+    "github": "https://github.com/RaulAlvaro",
+    "languages": [
+      {
+        "name": "Spanish",
+        "level": "Native (C2)"
+      },
+      {
+        "name": "English",
+        "level": "Professional (B2+) — holds technical and behavioral interviews"
+      }
+    ],
+    "id": "profile"
+  }
+]

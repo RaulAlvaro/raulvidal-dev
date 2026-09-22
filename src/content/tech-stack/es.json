@@ -1,0 +1,191 @@
+[
+  {
+    "locale": "es",
+    "name": "Astro",
+    "category": "core",
+    "order": 10,
+    "id": "astro"
+  },
+  {
+    "locale": "es",
+    "name": "AWS (Certified Cloud Practitioner)",
+    "category": "cloud",
+    "order": 1,
+    "id": "aws"
+  },
+  {
+    "locale": "es",
+    "name": "Claude Code",
+    "category": "as-needed",
+    "order": 3,
+    "id": "claude-code"
+  },
+  {
+    "locale": "es",
+    "name": "Cursor",
+    "category": "as-needed",
+    "order": 4,
+    "id": "cursor"
+  },
+  {
+    "locale": "es",
+    "name": "Docker",
+    "category": "infrastructure",
+    "order": 5,
+    "id": "docker"
+  },
+  {
+    "locale": "es",
+    "name": "Elasticsearch",
+    "category": "infrastructure",
+    "order": 3,
+    "id": "elasticsearch"
+  },
+  {
+    "locale": "es",
+    "name": "Arquitectura orientada a eventos",
+    "category": "core",
+    "order": 5,
+    "id": "event-driven"
+  },
+  {
+    "locale": "es",
+    "name": "GCP (Pub/Sub, Cloud Run)",
+    "category": "cloud",
+    "order": 2,
+    "id": "gcp"
+  },
+  {
+    "locale": "es",
+    "name": "GitHub Actions CI/CD",
+    "category": "infrastructure",
+    "order": 7,
+    "id": "github-actions"
+  },
+  {
+    "locale": "es",
+    "name": "Go (Gin, Gorm)",
+    "category": "as-needed",
+    "order": 1,
+    "id": "go"
+  },
+  {
+    "locale": "es",
+    "name": "GraphQL (Apollo Server/Client)",
+    "category": "core",
+    "order": 7,
+    "id": "graphql"
+  },
+  {
+    "locale": "es",
+    "name": "JavaScript ES6+",
+    "category": "core",
+    "order": 11,
+    "id": "js-es6"
+  },
+  {
+    "locale": "es",
+    "name": "Kubernetes / GKE (usado, no configurado)",
+    "category": "infrastructure",
+    "order": 6,
+    "id": "kubernetes"
+  },
+  {
+    "locale": "es",
+    "name": "Microservices",
+    "category": "core",
+    "order": 6,
+    "id": "microservices"
+  },
+  {
+    "locale": "es",
+    "name": "MongoDB",
+    "category": "infrastructure",
+    "order": 4,
+    "id": "mongodb"
+  },
+  {
+    "locale": "es",
+    "name": "NestJS",
+    "category": "core",
+    "order": 3,
+    "id": "nestjs"
+  },
+  {
+    "locale": "es",
+    "name": "Node.js",
+    "category": "core",
+    "order": 1,
+    "id": "node-js"
+  },
+  {
+    "locale": "es",
+    "name": "Orquestación Plan-Review-Execute",
+    "category": "as-needed",
+    "order": 5,
+    "id": "plan-review-execute"
+  },
+  {
+    "locale": "es",
+    "name": "PostgreSQL",
+    "category": "infrastructure",
+    "order": 1,
+    "id": "postgresql"
+  },
+  {
+    "locale": "es",
+    "name": "Prompt engineering",
+    "category": "as-needed",
+    "order": 6,
+    "id": "prompt-engineering"
+  },
+  {
+    "locale": "es",
+    "name": "Python / Flask",
+    "category": "as-needed",
+    "order": 2,
+    "id": "python"
+  },
+  {
+    "locale": "es",
+    "name": "React",
+    "category": "core",
+    "order": 9,
+    "id": "react"
+  },
+  {
+    "locale": "es",
+    "name": "Redis",
+    "category": "infrastructure",
+    "order": 2,
+    "id": "redis"
+  },
+  {
+    "locale": "es",
+    "name": "RESTful APIs",
+    "category": "core",
+    "order": 4,
+    "id": "restful-apis"
+  },
+  {
+    "locale": "es",
+    "name": "Serverless",
+    "category": "cloud",
+    "order": 3,
+    "id": "serverless"
+  },
+  {
+    "locale": "es",
+    "name": "TypeScript",
+    "category": "core",
+    "order": 2,
+    "id": "typescript"
+  },
+  {
+    "locale": "es",
+    "name": "Vue.js (2 y 3)",
+    "category": "core",
+    "order": 8,
+    "id": "vuejs"
+  }
+]
