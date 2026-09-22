@@ -51,9 +51,9 @@ const strings = t(locale);
         </div>
         <div class="hero__actions">
           <a href={`mailto:${profile.email}`} class="hero__cta">{strings.contactCta} →</a>
-          <button type="button" class="hero__cv" disabled title={strings.downloadComingSoon}>
+          <a href={`/cv-raul-vidal-${locale}.pdf`} class="hero__cv" download="Raul Vidal Software Engineer.pdf">
             {strings.downloadCv}
-          </button>
+          </a>
         </div>
       </div>
 
@@ -236,13 +236,19 @@ const strings = t(locale);
   .hero__cv {
     font-family: var(--font-mono);
     font-size: 0.85rem;
-    color: var(--color-ink-faint);
+    color: var(--color-ink-dim);
     background: none;
     border: 1px solid var(--color-rule);
     padding: var(--space-3) var(--space-4);
     border-radius: 2px;
-    cursor: not-allowed;
     white-space: nowrap;
+  }
+
+  .hero__cv:hover,
+  .hero__cv:focus-visible {
+    color: var(--color-ink);
+    border-color: var(--color-accent-dim);
+    text-decoration: none;
   }
 
   .hero__side {
