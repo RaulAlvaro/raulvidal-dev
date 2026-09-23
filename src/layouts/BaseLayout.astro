@@ -97,5 +97,11 @@ const { locale, title, description } = Astro.props;
 
       window.__theme = { current: currentTheme, apply: applyTheme };
     </script>
+    <!-- Cloudflare Web Analytics -->
+    <script
+      is:inline
+      type="module"
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "e7d78e9c516d4030ac3c6b158517d3fd"}'></script>
   </body>
 </html>
