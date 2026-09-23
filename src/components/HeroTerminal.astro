@@ -37,6 +37,15 @@ const strings = t(locale);
   const root = document.currentScript.previousElementSibling;
   const body = root.querySelector('[data-terminal-body]');
   const input = root.querySelector('[data-terminal-input]');
+  const REFOCUS_KEY = 'terminal:refocus';
+
+  // Restore focus only when arriving from a `lang` switch, never on a plain load or refresh.
+  try {
+    if (sessionStorage.getItem(REFOCUS_KEY)) {
+      sessionStorage.removeItem(REFOCUS_KEY);
+      input.focus({ preventScroll: true });
+    }
+  } catch (e) {}
 
   function fmt(template, replacements) {
     return template.replace(/\{(\w+)\}/g, (_, key) => replacements[key] ?? '');
@@ -91,6 +100,9 @@ const strings = t(locale);
         if (target === 'en' || target === 'es') {
           appendLine(fmt(strings.langSwitching, { lang: target }));
           setTimeout(() => {
+            try {
+              sessionStorage.setItem(REFOCUS_KEY, '1');
+            } catch (e) {}
             const path = target === 'en' ? '/' : '/es/';
             window.location.href = path;
           }, 500);
