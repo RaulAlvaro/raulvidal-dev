@@ -69,9 +69,11 @@ const strings = t(locale);
 
 <style>
   .hero {
+    /* Stop short of the full viewport so the next section's heading peeks in: the cut-off reads as "there's more". */
+    --hero-peek: 10.5rem;
     padding-inline: var(--content-pad);
     padding-block: var(--space-6);
-    min-height: 100svh;
+    min-height: calc(100svh - var(--hero-peek));
     display: flex;
   }
 
