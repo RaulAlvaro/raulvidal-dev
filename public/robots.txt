@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://raulvidal.dev/sitemap-index.xml
