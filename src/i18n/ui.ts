@@ -67,7 +67,7 @@ export const ui = {
         'f4b7e2d  chore: plan-review-execute workflow w/ Claude Code',
       ],
       contact: [
-        'raul.vidal.trujillo@gmail.com',
+        'hello@raulvidal.dev',
         'linkedin.com/in/raul-vidal-trujillo',
         'github.com/RaulAlvaro',
       ],
@@ -148,7 +148,7 @@ export const ui = {
         'f4b7e2d  chore: workflow plan-review-execute con Claude Code',
       ],
       contact: [
-        'raul.vidal.trujillo@gmail.com',
+        'hello@raulvidal.dev',
         'linkedin.com/in/raul-vidal-trujillo',
         'github.com/RaulAlvaro',
       ],
