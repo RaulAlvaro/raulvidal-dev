@@ -7,10 +7,10 @@ export const ui = {
     scrollHint: 'scroll to read the full record ↓',
     themeToggleLabel: 'Toggle color theme',
     toc: {
-      impact: '1 SELECTED IMPACT',
-      howIWork: '2 HOW I WORK',
-      stack: '3 STACK',
-      experience: '4 EXPERIENCE',
+      experience: '1 EXPERIENCE',
+      impact: '2 SELECTED IMPACT',
+      howIWork: '3 HOW I WORK',
+      stack: '4 STACK',
       education: '5 EDUCATION',
     },
     sections: {
@@ -88,10 +88,10 @@ export const ui = {
     scrollHint: 'desplázate para leer el documento completo ↓',
     themeToggleLabel: 'Cambiar tema de color',
     toc: {
-      impact: '1 IMPACTO DESTACADO',
-      howIWork: '2 CÓMO TRABAJO',
-      stack: '3 STACK',
-      experience: '4 EXPERIENCIA',
+      experience: '1 EXPERIENCIA',
+      impact: '2 IMPACTO DESTACADO',
+      howIWork: '3 CÓMO TRABAJO',
+      stack: '4 STACK',
       education: '5 EDUCACIÓN',
     },
     sections: {

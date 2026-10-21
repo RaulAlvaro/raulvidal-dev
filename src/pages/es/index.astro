@@ -14,9 +14,9 @@ const profile = await getProfile(locale);
 
 <BaseLayout locale={locale} title={`${profile.name} — Software Engineer`} description={profile.positioning}>
   <Hero locale={locale} />
+  <ExperienceSection locale={locale} />
   <ImpactSection locale={locale} />
   <HowIWorkSection locale={locale} />
   <StackSection locale={locale} />
-  <ExperienceSection locale={locale} />
   <EducationSection locale={locale} />
 </BaseLayout>

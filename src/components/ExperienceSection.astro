@@ -23,9 +23,13 @@ function formatDate(value: string) {
     <h2 class="section-label">{strings.sections.experience}</h2>
     <hr class="hairline experience__rule" />
 
-    <div class="experience__list">
+    <div class="experience__list" data-timeline>
+      <div class="experience__rail" aria-hidden="true">
+        <span class="experience__rail-fill"></span>
+        <span class="experience__rail-head"></span>
+      </div>
       {experiences.map((exp) => (
-        <article class="experience__item">
+        <article class="experience__item" data-timeline-node>
           <div class="experience__dates">
             {formatDate(exp.startDate)} — {exp.endDate ? formatDate(exp.endDate) : strings.present}
           </div>
@@ -46,9 +50,54 @@ function formatDate(value: string) {
   </div>
 </section>
 
+<script>
+  // Scroll-linked commit graph: the rail fills up to the viewport's midline, newest entry first,
+  // and rewinds when scrolling back up. Without JS (or with reduced motion) it renders fully drawn.
+  const list = document.querySelector<HTMLElement>('[data-timeline]');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Vertical center of each commit node, matching `top` on .experience__item::before.
+  const NODE_Y = 9;
+
+  if (list && !reducedMotion) {
+    const rail = list.querySelector<HTMLElement>('.experience__rail')!;
+    const nodes = [...list.querySelectorAll<HTMLElement>('[data-timeline-node]')];
+    let start = 0;
+    let end = 0;
+    let nodeOffsets: number[] = [];
+
+    const measure = () => {
+      const listTop = list.getBoundingClientRect().top;
+      nodeOffsets = nodes.map((node) => node.getBoundingClientRect().top - listTop + NODE_Y);
+      start = nodeOffsets[0];
+      end = nodeOffsets[nodeOffsets.length - 1];
+      rail.style.top = `${start}px`;
+      rail.style.height = `${end - start}px`;
+    };
+
+    const update = () => {
+      const tip = window.innerHeight * 0.55 - list.getBoundingClientRect().top;
+      const progress = Math.min(1, Math.max(0, (tip - start) / (end - start || 1)));
+      list.style.setProperty('--timeline-progress', progress.toFixed(4));
+      nodes.forEach((node, i) => node.classList.toggle('is-reached', tip >= nodeOffsets[i] - 1));
+    };
+
+    let frame = 0;
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(() => ((frame = 0), update()));
+    };
+
+    list.classList.add('is-tracking');
+    measure();
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    new ResizeObserver(() => (measure(), update())).observe(list);
+  }
+</script>
+
 <style>
   .experience {
-    padding-block: var(--space-16);
+    padding-block: var(--space-24) var(--space-16);
   }
 
   .experience__rule {
@@ -56,12 +105,51 @@ function formatDate(value: string) {
   }
 
   .experience__list {
+    --rail-x: calc(13.5rem + var(--space-6) / 2);
+    --timeline-progress: 1;
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-12);
   }
 
+  .experience__rail {
+    position: absolute;
+    left: var(--rail-x);
+    top: 9px;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-rule);
+  }
+
+  .experience__rail-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--color-accent);
+    transform: scaleY(var(--timeline-progress));
+    transform-origin: top;
+  }
+
+  .experience__rail-head {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--timeline-progress) * 100%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-bg);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .experience__list.is-tracking .experience__rail-head {
+    opacity: calc(min(1, var(--timeline-progress) * 40) * min(1, (1 - var(--timeline-progress)) * 40));
+  }
+
   .experience__item {
+    position: relative;
     display: grid;
     grid-template-columns: 13.5rem 1fr;
     gap: var(--space-6);
@@ -73,12 +161,38 @@ function formatDate(value: string) {
     border-bottom: none;
   }
 
+  /* Commit node on the rail; fills in once the scroll tip reaches it. */
+  .experience__item::before {
+    content: '';
+    position: absolute;
+    left: var(--rail-x);
+    top: 9px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1px solid var(--color-accent);
+    background: var(--color-accent);
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  }
+
+  .experience__list.is-tracking .experience__item:not(.is-reached)::before {
+    background: var(--color-bg);
+    border-color: var(--color-ink-faint);
+  }
+
   .experience__dates {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--color-ink-dim);
     padding-top: 0.2rem;
     white-space: nowrap;
+    transition: color 0.3s ease;
+  }
+
+  .experience__list.is-tracking .experience__item.is-reached .experience__dates {
+    color: var(--color-ink);
   }
 
   .experience__role {
@@ -122,9 +236,14 @@ function formatDate(value: string) {
   }
 
   @media (max-width: 640px) {
+    .experience__list {
+      --rail-x: 4px;
+    }
+
     .experience__item {
       grid-template-columns: 1fr;
       gap: var(--space-2);
+      padding-left: var(--space-6);
     }
   }
 </style>
