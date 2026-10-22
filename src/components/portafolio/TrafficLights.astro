@@ -1,0 +1,91 @@
+---
+// macOS window controls: grey like an inactive window, painted in the system colours with
+// their glyphs while hovered (always painted on touch screens, which have no hover).
+---
+
+<span class="lights" aria-hidden="true">
+  <span class="light light--close">
+    <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" /></svg>
+  </span>
+  <span class="light light--minimize">
+    <svg viewBox="0 0 12 12"><path d="M3 6h6" /></svg>
+  </span>
+  <span class="light light--zoom">
+    <svg viewBox="0 0 12 12"><path class="fill" d="M3.5 4.5v4h4zM8.5 7.5v-4h-4z" /></svg>
+  </span>
+</span>
+
+<style>
+  .lights {
+    display: inline-flex;
+    gap: 8px;
+    padding: 4px 0;
+  }
+
+  .light {
+    position: relative;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--light-idle, #3a3a42);
+    box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.18);
+    transition: background-color 0.15s ease;
+  }
+
+  .light svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+
+  .light path {
+    stroke: rgb(0 0 0 / 0.55);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    fill: none;
+  }
+
+  .light path.fill {
+    stroke: none;
+    fill: rgb(0 0 0 / 0.55);
+  }
+
+  .lights:hover .light--close,
+  .lights:hover .light--minimize,
+  .lights:hover .light--zoom {
+    transition-duration: 0.08s;
+  }
+
+  .lights:hover .light--close {
+    background: #ff5f57;
+  }
+
+  .lights:hover .light--minimize {
+    background: #febc2e;
+  }
+
+  .lights:hover .light--zoom {
+    background: #28c840;
+  }
+
+  .lights:hover svg {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .light--close {
+      background: #ff5f57;
+    }
+
+    .light--minimize {
+      background: #febc2e;
+    }
+
+    .light--zoom {
+      background: #28c840;
+    }
+  }
+</style>

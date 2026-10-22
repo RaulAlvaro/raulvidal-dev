@@ -28,3 +28,6 @@ pnpm-debug.log*
 .codex
 .impeccable
 .vscode
+
+# portfolio source images (full-res originals; only optimized crops are committed)
+src/assets/portafolio/source/
