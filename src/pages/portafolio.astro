@@ -5,6 +5,7 @@ import '../styles/tokens.css';
 import relinkInterfaz from '../assets/portafolio/relink-interfaz.webp';
 import TrafficLights from '../components/portafolio/TrafficLights.astro';
 import ProductWalk from '../components/portafolio/ProductWalk.astro';
+import LayerStack from '../components/portafolio/LayerStack.astro';
 
 // Screens in flow order: filenames carry the step number ("03-empresa-usuarios.webp").
 function shots(modules: Record<string, { default: ImageMetadata }>) {
@@ -20,10 +21,10 @@ const [relinkEmpresa, relinkSupervisores, relinkUsuario, relinkHome, relinkHomeS
 const email = 'hello@raulvidal.dev';
 
 const layers = [
-  { label: 'INTERFAZ', note: 'Web pública · Vue 3' },
-  { label: 'PANEL INTERNO', note: 'Reporte de la empresa' },
-  { label: 'API', note: 'Dominio hexagonal · Node.js' },
-  { label: 'BASE DE DATOS', note: 'PostgreSQL' },
+  { label: 'INTERFAZ', note: 'Lo que ve tu cliente' },
+  { label: 'PANEL', note: 'Lo que tú editas' },
+  { label: 'API', note: 'Backend · Node.js' },
+  { label: 'DATOS', note: 'PostgreSQL' },
 ];
 
 const relinkChapters = [
@@ -31,6 +32,7 @@ const relinkChapters = [
     title: 'Web pública',
     body: 'Orienta a personas y empresas en la reconversión laboral: qué habilidades piden los nuevos trabajos y cómo llegar a ellos.',
     screens: [
+      { img: relinkInterfaz, kind: 'page' as const },
       { img: relinkHome, kind: 'page' as const },
       { img: relinkHomeScroll, kind: 'page' as const },
     ],
@@ -116,7 +118,7 @@ const demoImages = [
     </header>
 
     <main>
-      <!-- HERO: Relink, exploded on scroll -->
+      <!-- HERO: a product site that opens into the system behind it -->
       <section class="hero is-flat" data-hero aria-labelledby="hero-title">
         <div class="hero__pin">
           <canvas class="hero__water" data-water aria-hidden="true"></canvas>
@@ -126,40 +128,12 @@ const demoImages = [
               <span class="line"><span>y lo que lo</span></span>
               <span class="line"><span>sostiene.</span></span>
             </h1>
-            <p class="mono hero__meta">Relink · plataforma de reconversión laboral · desarrollo full stack</p>
-            <a class="mono hero__cta" href="#relink">Ver el proyecto ↓</a>
+            <p class="mono hero__meta">Webs y productos digitales · de la interfaz a la base de datos</p>
+            <a class="mono hero__cta" href="#relink">Ver proyectos ↓</a>
           </div>
 
-          <div class="stage" aria-hidden="true">
-            <div class="stack" data-stack>
-              <div class="plane" data-plane>
-                <!-- Bottom layer first: DOM order is paint order, so the public site sits on top when flat. -->
-                <div class="layer layer--db" data-layer="3">
-                  <div class="db__name">PostgreSQL</div>
-                  <div class="db__tables">
-                    <span>personas</span>
-                    <span>empresas</span>
-                    <span>habilidades</span>
-                    <span>validaciones</span>
-                  </div>
-                </div>
-                <div class="layer layer--api" data-layer="2">
-                  <div class="api__core">Dominio<small>arquitectura hexagonal</small></div>
-                  <div class="api__ports">
-                    <span>Magic Links · JWT</span>
-                    <span>Roles · supervisor</span>
-                    <span>Strapi · contenido</span>
-                    <span>Pub/Sub · Cloud Run</span>
-                  </div>
-                </div>
-                <div class="layer layer--shot" data-layer="1">
-                  <img src={relinkEmpresa.src} width={relinkEmpresa.width} height={relinkEmpresa.height} alt="" />
-                </div>
-                <div class="layer layer--shot" data-layer="0">
-                  <img src={relinkInterfaz.src} width={relinkInterfaz.width} height={relinkInterfaz.height} alt="" />
-                </div>
-              </div>
-            </div>
+          <div class="stage-slot" aria-hidden="true">
+            <LayerStack />
           </div>
 
           <ol class="labels" data-labels>
@@ -323,13 +297,27 @@ const demoImages = [
       const hero = document.querySelector<HTMLElement>('[data-hero]')!;
       const labels = gsap.utils.toArray<HTMLElement>('[data-label]');
       const labelsBox = document.querySelector<HTMLElement>('[data-labels]')!;
+      const beams = gsap.utils.toArray<HTMLElement>('[data-beam]');
+      const lifts = gsap.utils.toArray<HTMLElement>('[data-lift]');
       const TILT = { rotateX: 56, scale: 0.5 };
       const TURN = { rotateZ: -40 };
 
       // Gap scales with the stack, capped so the open stack fits short viewports
       // (1.4 ≈ projected spread per unit of gap at this tilt and scale).
-      const gap = () => Math.min(stack.offsetHeight * 0.72, (stage.offsetHeight * 0.36) / 1.4);
+      const gap = () => Math.min(stack.offsetHeight * 0.72, (stage.offsetHeight * (window.innerWidth > 800 ? 0.32 : 0.24)) / 1.4);
       const openZ = (i: number) => ((layerEls.length - 1) / 2 - i) * gap();
+      const bottomZ = () => openZ(layerEls.length - 1);
+
+      // Layer content is sized in --u (1% of the stack width); beams span the opened stack, from
+      // the data layer up to the site.
+      function sizeStack() {
+        stack.style.setProperty('--u', `${stack.offsetWidth / 100}px`);
+        beams.forEach((beam) => beam.style.setProperty('--beam-h', `${openZ(0) - bottomZ()}px`));
+      }
+      sizeStack();
+      new ResizeObserver(sizeStack).observe(stack);
+      // Site components rise off their layer by a few percent of the stack width.
+      const liftZ = (i: number) => stack.offsetWidth * (0.025 + (i % 3) * 0.012);
 
       // Labels sit in their own column, each vertically on its layer's projected center, with a
       // leader line reaching back to the layer's right edge.
@@ -399,6 +387,8 @@ const demoImages = [
         gsap.set(stack, TILT);
         gsap.set(plane, TURN);
         layerEls.forEach((el, i) => gsap.set(el, { z: openZ(i) }));
+        gsap.set(beams, { z: bottomZ(), rotationX: -90, scaleY: 1, autoAlpha: 1 });
+        lifts.forEach((el, i) => gsap.set(el, { z: liftZ(i) }));
         gsap.set(labels, { opacity: 1 });
         requestAnimationFrame(placeLabels);
         window.addEventListener('resize', placeLabels);
@@ -434,9 +424,13 @@ const demoImages = [
               invalidateOnRefresh: true,
               onUpdate: (self) => {
                 hero.classList.toggle('is-flat', self.progress < 0.001);
+                hero.classList.toggle('is-flowing', self.progress > 0.4);
                 placeLabels();
               },
-              onRefresh: placeLabels,
+              onRefresh: () => {
+                sizeStack();
+                placeLabels();
+              },
             },
           });
           tl.fromTo(stack, { rotateX: 0, scale: 1 }, { ...TILT, duration: 1, ease: 'power2.inOut' }, 0);
@@ -444,10 +438,24 @@ const demoImages = [
           layerEls.forEach((el, i) => {
             tl.fromTo(el, { z: 0 }, { z: () => openZ(i), duration: 1.4, ease: 'power3.out' }, 0.8);
           });
+          // Beams stand on the data layer and grow with the spread, so their tops stay on the site.
+          beams.forEach((beam) => {
+            tl.fromTo(
+              beam,
+              { z: 0, rotationX: -90, scaleY: 0, autoAlpha: 0 },
+              { z: bottomZ, scaleY: 1, autoAlpha: 1, duration: 1.4, ease: 'power3.out' },
+              0.8,
+            );
+          });
+          lifts.forEach((el, i) => {
+            tl.fromTo(el, { z: 0 }, { z: () => liftZ(i), duration: 0.9, ease: 'power2.out' }, 1 + i * 0.05);
+          });
           labels.forEach((label, i) => {
             tl.fromTo(label, { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.35, ease: 'power2.out' }, 1.05 + i * 0.22);
           });
           tl.to('.hero__copy', { opacity: 0.25, duration: 0.6 }, 2);
+          // Phones: the headline sits above the stack, so the stack rises as it opens to stay in view.
+          if (!isDesktop) tl.to('.stage-slot', { yPercent: -22, duration: 1.4, ease: 'power3.out' }, 0.8);
           tl.to({}, { duration: 0.6 });
 
           // Walkthroughs: on desktop each browser frame pins and scroll plays its screens; on
@@ -646,125 +654,12 @@ const demoImages = [
         grid-row: 1;
       }
 
-      .stage {
+      .stage-slot {
         position: relative;
         grid-column: 2 / 4;
         grid-row: 1;
-        perspective: 3000px;
-        display: grid;
-        place-items: center;
         height: 100%;
         min-height: 0;
-      }
-
-      .stack {
-        position: relative;
-        width: min(62vw, 1200px, (100vh - 8rem) * 1.8);
-        aspect-ratio: 2400 / 1313;
-        transform-style: preserve-3d;
-      }
-
-      .plane {
-        position: absolute;
-        inset: 0;
-        transform-style: preserve-3d;
-      }
-
-      /* Scroll 0: no 3D context at all, so the screenshot renders as a plain, crisp image. */
-      .is-flat .stage {
-        perspective: none;
-      }
-
-      .is-flat .stack,
-      .is-flat .plane {
-        transform-style: flat;
-      }
-
-      .is-flat .layer {
-        backface-visibility: visible;
-      }
-
-      .layer {
-        position: absolute;
-        inset: 0;
-        border-radius: 6px;
-        overflow: hidden;
-        backface-visibility: hidden;
-      }
-
-      .layer--shot {
-        background: #fff;
-        box-shadow: 0 40px 60px -30px rgb(0 0 0 / 0.7);
-      }
-
-      .layer--shot img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: top left;
-        display: block;
-      }
-
-      .layer--api,
-      .layer--db {
-        background: color-mix(in srgb, var(--color-bg-raised) 94%, transparent);
-        border: 1px solid #2f2f36;
-        font-family: var(--font-mono);
-        color: var(--color-accent);
-        font-size: clamp(0.5rem, 0.95vw, 0.85rem);
-      }
-
-      .layer--api {
-        display: grid;
-        align-content: center;
-        justify-items: center;
-        gap: 12%;
-      }
-
-      .api__core {
-        border: 1px solid var(--color-accent);
-        padding: 0.9em 2.4em;
-        border-radius: 3px;
-        text-align: center;
-        display: grid;
-        gap: 0.3em;
-      }
-
-      .api__core small {
-        color: var(--color-ink-dim);
-        font-size: 0.8em;
-      }
-
-      .api__ports {
-        display: grid;
-        grid-template-columns: repeat(4, auto);
-        gap: 1.4em;
-      }
-
-      .api__ports span,
-      .db__tables span {
-        border: 1px solid var(--color-accent-dim);
-        padding: 0.7em 0.9em;
-        border-radius: 3px;
-        white-space: nowrap;
-      }
-
-      .layer--db {
-        display: grid;
-        align-content: center;
-        justify-items: center;
-        gap: 10%;
-      }
-
-      .db__name {
-        color: var(--color-ink);
-        letter-spacing: 0.08em;
-      }
-
-      .db__tables {
-        display: grid;
-        grid-template-columns: repeat(4, auto);
-        gap: 1.4em;
       }
 
       .labels {
@@ -1143,7 +1038,7 @@ const demoImages = [
         }
 
         .hero__copy,
-        .stage {
+        .stage-slot {
           grid-column: 1;
           grid-row: auto;
         }
@@ -1161,10 +1056,6 @@ const demoImages = [
           display: none;
         }
 
-        .stack {
-          width: min(86vw, (100svh - 22rem) * 1.5);
-        }
-
         .labels {
           display: none;
         }
@@ -1179,11 +1070,6 @@ const demoImages = [
           gap: 0.75rem;
         }
 
-        .api__ports,
-        .db__tables {
-          grid-template-columns: repeat(2, auto);
-          gap: 0.8em;
-        }
       }
     </style>
   </body>
