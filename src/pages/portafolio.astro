@@ -1,0 +1,1190 @@
+---
+// Private pitch page: shared by direct link only (noindex, excluded from the sitemap, never
+// linked from the CV). Spanish only. GSAP + Lenis are imported here and nowhere else.
+import '../styles/tokens.css';
+import relinkInterfaz from '../assets/portafolio/relink-interfaz.webp';
+import TrafficLights from '../components/portafolio/TrafficLights.astro';
+import ProductWalk from '../components/portafolio/ProductWalk.astro';
+
+// Screens in flow order: filenames carry the step number ("03-empresa-usuarios.webp").
+function shots(modules: Record<string, { default: ImageMetadata }>) {
+  return Object.entries(modules)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, mod]) => mod.default);
+}
+const hazloShots = shots(import.meta.glob('../assets/portafolio/hazlo/*.webp', { eager: true }));
+const [relinkEmpresa, relinkSupervisores, relinkUsuario, relinkHome, relinkHomeScroll] = shots(
+  import.meta.glob('../assets/portafolio/relink-web/*.webp', { eager: true }),
+);
+
+const email = 'hello@raulvidal.dev';
+
+const layers = [
+  { label: 'INTERFAZ', note: 'Web pública · Vue 3' },
+  { label: 'PANEL INTERNO', note: 'Reporte de la empresa' },
+  { label: 'API', note: 'Dominio hexagonal · Node.js' },
+  { label: 'BASE DE DATOS', note: 'PostgreSQL' },
+];
+
+const relinkChapters = [
+  {
+    title: 'Web pública',
+    body: 'Orienta a personas y empresas en la reconversión laboral: qué habilidades piden los nuevos trabajos y cómo llegar a ellos.',
+    screens: [
+      { img: relinkHome, kind: 'page' as const },
+      { img: relinkHomeScroll, kind: 'page' as const },
+    ],
+  },
+  {
+    title: 'Reporte de la empresa',
+    body: 'Cada empresa ve en un solo panel el estado de sus proyectos y la actividad de sus colaboradores.',
+    screens: [{ img: relinkEmpresa, kind: 'page' as const }],
+  },
+  {
+    title: 'Rol supervisor',
+    stat: '2.000+',
+    body: 'Diseñé y lancé este rol de punta a punta: los supervisores validan las habilidades de su equipo. Suma 2.000+ usuarios e impulsó pruebas en 15 nuevas cuentas enterprise.',
+    screens: [{ img: relinkSupervisores, kind: 'page' as const }],
+  },
+  {
+    title: 'Acceso sin contraseña',
+    stat: '11.500+',
+    body: 'Los colaboradores entran con Magic Links (JWT), un flujo que diseñé e implementé, y llegan directo a su inicio. En producción para 11.500+ usuarios enterprise.',
+    screens: [{ img: relinkUsuario, kind: 'page' as const }],
+  },
+];
+
+// Hazlo con IA screens are numbered in flow order; each chapter takes the next run of them.
+const hazloRuns: { title: string; body: string; kinds: ('page' | 'modal')[] }[] = [
+  {
+    title: 'Registro',
+    body: 'Un registro en tres pasos. Antes de crear la cuenta, la persona revisa sus datos sobre la vista previa de su certificado.',
+    kinds: ['page', 'modal', 'modal'],
+  },
+  {
+    title: 'Inicio de sesión',
+    body: 'Acceso con correo validado; la cuenta solo se activa después de confirmar el email.',
+    kinds: ['page'],
+  },
+  {
+    title: 'Cuestionario',
+    body: 'Elige su perfil (pyme, funcionario público, salud u otro) y las habilidades que quiere potenciar con IA. El progreso se guarda solo.',
+    kinds: ['page', 'page', 'page', 'page', 'page', 'modal'],
+  },
+  {
+    title: 'Tu ruta',
+    body: 'Al terminar recibe su resultado y una ruta de cursos hecha para su perfil, con el curso obligatorio primero.',
+    kinds: ['page'],
+  },
+];
+let nextShot = 0;
+const hazloChapters = hazloRuns.map(({ kinds, ...chapter }) => ({
+  ...chapter,
+  screens: kinds.map((kind) => ({ img: hazloShots[nextShot++], kind })),
+}));
+
+const relinkProfiles = ['Empresas', 'Empleados', 'Desempleados', 'Sector público'];
+const hazloProfiles = ['Funcionario Público de Salud', 'Mipyme', 'Funcionario Público', 'Otros sectores'];
+
+const demoImages = [
+  { id: 'interfaz', src: relinkInterfaz.src, label: 'Portada' },
+  { id: 'panel', src: relinkEmpresa.src, label: 'Panel' },
+  { id: 'intranet', src: hazloShots[hazloShots.length - 1].src, label: 'Intranet' },
+];
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Portafolio privado de Raul Vidal: Relink y Hazlo con IA, por fuera y por dentro." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Raul Vidal · Portafolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Spline+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="bar">
+      <a class="bar__name" href="https://raulvidal.dev/es/">RAUL VIDAL · PORTAFOLIO</a>
+      <a href={`mailto:${email}`}>Contactar →</a>
+    </header>
+
+    <main>
+      <!-- HERO: Relink, exploded on scroll -->
+      <section class="hero is-flat" data-hero aria-labelledby="hero-title">
+        <div class="hero__pin">
+          <canvas class="hero__water" data-water aria-hidden="true"></canvas>
+          <div class="hero__copy">
+            <h1 id="hero-title" class="hero__title">
+              <span class="line"><span>Lo que se ve,</span></span>
+              <span class="line"><span>y lo que lo</span></span>
+              <span class="line"><span>sostiene.</span></span>
+            </h1>
+            <p class="mono hero__meta">Relink · plataforma de reconversión laboral · desarrollo full stack</p>
+            <a class="mono hero__cta" href="#relink">Ver el proyecto ↓</a>
+          </div>
+
+          <div class="stage" aria-hidden="true">
+            <div class="stack" data-stack>
+              <div class="plane" data-plane>
+                <!-- Bottom layer first: DOM order is paint order, so the public site sits on top when flat. -->
+                <div class="layer layer--db" data-layer="3">
+                  <div class="db__name">PostgreSQL</div>
+                  <div class="db__tables">
+                    <span>personas</span>
+                    <span>empresas</span>
+                    <span>habilidades</span>
+                    <span>validaciones</span>
+                  </div>
+                </div>
+                <div class="layer layer--api" data-layer="2">
+                  <div class="api__core">Dominio<small>arquitectura hexagonal</small></div>
+                  <div class="api__ports">
+                    <span>Magic Links · JWT</span>
+                    <span>Roles · supervisor</span>
+                    <span>Strapi · contenido</span>
+                    <span>Pub/Sub · Cloud Run</span>
+                  </div>
+                </div>
+                <div class="layer layer--shot" data-layer="1">
+                  <img src={relinkEmpresa.src} width={relinkEmpresa.width} height={relinkEmpresa.height} alt="" />
+                </div>
+                <div class="layer layer--shot" data-layer="0">
+                  <img src={relinkInterfaz.src} width={relinkInterfaz.width} height={relinkInterfaz.height} alt="" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ol class="labels" data-labels>
+            {layers.map((layer) => (
+              <li class="label" data-label>
+                <span class="label__line" data-label-line></span>
+                <span class="label__text">
+                  <span class="label__name">{layer.label}</span>
+                  <span class="label__note">{layer.note}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <!-- RELINK: intro → walkthrough → closing figure -->
+      <section id="relink" class="section project" aria-labelledby="relink-title">
+        <div class="wrap project__intro">
+          <div>
+            <h2 id="relink-title" class="display">Relink</h2>
+            <p class="mono dim">2021 — 2026 · Chile · plataforma de reconversión laboral</p>
+          </div>
+          <p class="lead">
+            Por fuera, una web clara para personas y empresas. Por dentro, un producto que miles de usuarios usan cada día:
+            autenticación, roles y reportes. Lideré su migración a arquitectura hexagonal (v2), que separó la lógica del
+            negocio de Strapi y sumó Pub/Sub y Cloud Run para escalar.
+          </p>
+        </div>
+
+        <ProductWalk name="Relink" address="relink.cl" chapters={relinkChapters} />
+
+        <div class="wrap project__outro">
+          <div class="figure">
+            <span class="figure__value" data-count="12000" data-suffix="+">12.000+</span>
+            <div class="figure__text">
+              <span class="figure__title">usuarios en la plataforma</span>
+              <ul class="figure__tags">
+                {relinkProfiles.map((profile) => <li class="mono">{profile}</li>)}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HAZLO CON IA: intro → walkthrough → closing figure -->
+      <section class="section project" aria-labelledby="hazlo-title">
+        <div class="wrap project__intro">
+          <div>
+            <h2 id="hazlo-title" class="display">Hazlo con IA</h2>
+            <p class="mono dim">2025 — 2026 · plataforma de cursos de IA</p>
+          </div>
+          <p class="lead">
+            Intranet de formación en IA generativa para pymes y funcionarios públicos (CENIA, Chile). Construí la intranet
+            completa: del registro a la ruta de aprendizaje personalizada.
+          </p>
+        </div>
+
+        <ProductWalk name="Hazlo con IA" address="hazloconia.cl" chapters={hazloChapters} />
+
+        <div class="wrap project__outro">
+          <div class="figure">
+            <span class="figure__value" data-count="120000" data-suffix="+">120.000+</span>
+            <div class="figure__text">
+              <span class="figure__title">usuarios en la plataforma, de cuatro perfiles</span>
+              <ul class="figure__tags">
+                {hazloProfiles.map((profile) => <li class="mono">{profile}</li>)}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADMINISTRABLE demo -->
+      <section class="section demo" aria-labelledby="demo-title">
+        <div class="wrap">
+          <h2 id="demo-title" class="display demo__title">Y tú la administras.</h2>
+          <p class="lead demo__lead">
+            Cada web que construyo trae su panel: cambias un texto o una imagen y la web se actualiza, sin tocar código.
+            Pruébalo aquí.
+          </p>
+
+          <div class="demo__grid">
+            <form class="editor" data-editor>
+              <p class="mono editor__title">Panel de edición</p>
+              <label class="field">
+                <span class="mono">Titular</span>
+                <input name="title" type="text" maxlength="60" value="Lo que se ve, y lo que lo sostiene." />
+              </label>
+              <label class="field">
+                <span class="mono">Subtítulo</span>
+                <input name="subtitle" type="text" maxlength="90" value="Productos digitales hechos para durar." />
+              </label>
+              <fieldset class="field">
+                <legend class="mono">Imagen</legend>
+                <div class="swatches">
+                  {demoImages.map((img, i) => (
+                    <label class="swatch">
+                      <input type="radio" name="image" value={img.src} checked={i === 0} />
+                      <img src={img.src} alt="" />
+                      <span class="mono">{img.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <button class="publish mono" type="submit">Publicar cambios</button>
+              <p class="mono editor__status" role="status" data-status></p>
+            </form>
+
+            <div class="preview" data-preview>
+              <div class="preview__bar">
+                <TrafficLights />
+                <em class="mono">tu-sitio.com</em>
+              </div>
+              <div class="preview__page">
+                <nav class="preview__nav mono"><b>tu marca</b><span>Productos</span><span>Nosotros</span><span>Contacto</span></nav>
+                <h3 class="preview__title" data-out="title">Lo que se ve, y lo que lo sostiene.</h3>
+                <p class="preview__subtitle" data-out="subtitle">Productos digitales hechos para durar.</p>
+                <div class="preview__media">
+                  <img data-out="image" src={demoImages[0].src} alt="" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CLOSE -->
+      <section class="section close">
+        <div class="wrap">
+          <h2 class="display close__title">¿Conversamos?</h2>
+          <p class="close__links mono">
+            <a href={`mailto:${email}`}>{email}</a>
+            <a href="https://linkedin.com/in/raul-vidal-trujillo" target="_blank" rel="noopener noreferrer">linkedin.com/in/raul-vidal-trujillo</a>
+            <a href="https://raulvidal.dev/es/">raulvidal.dev</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      import gsap from 'gsap';
+      import { ScrollTrigger } from 'gsap/ScrollTrigger';
+      import Lenis from 'lenis';
+      import 'lenis/dist/lenis.css';
+      import { createWater } from '../scripts/water';
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const root = document.documentElement;
+
+      // ─── Exploded stack geometry ───
+      // Tilt (rotateX) lives on the outer stack and the turn (rotateZ) on the inner plane, so the
+      // planes' shared normal stays screen-vertical and the layers open straight up and down.
+      const stage = document.querySelector<HTMLElement>('.stage')!;
+      const stack = document.querySelector<HTMLElement>('[data-stack]')!;
+      const plane = document.querySelector<HTMLElement>('[data-plane]')!;
+      // Top-down (0 = public site), independent of DOM paint order.
+      const layerEls = gsap.utils.toArray<HTMLElement>('[data-layer]').sort((a, b) => Number(a.dataset.layer) - Number(b.dataset.layer));
+      const hero = document.querySelector<HTMLElement>('[data-hero]')!;
+      const labels = gsap.utils.toArray<HTMLElement>('[data-label]');
+      const labelsBox = document.querySelector<HTMLElement>('[data-labels]')!;
+      const TILT = { rotateX: 56, scale: 0.5 };
+      const TURN = { rotateZ: -40 };
+
+      // Gap scales with the stack, capped so the open stack fits short viewports
+      // (1.4 ≈ projected spread per unit of gap at this tilt and scale).
+      const gap = () => Math.min(stack.offsetHeight * 0.72, (stage.offsetHeight * 0.36) / 1.4);
+      const openZ = (i: number) => ((layerEls.length - 1) / 2 - i) * gap();
+
+      // Labels sit in their own column, each vertically on its layer's projected center, with a
+      // leader line reaching back to the layer's right edge.
+      function placeLabels() {
+        const box = labelsBox.getBoundingClientRect();
+        layerEls.forEach((layer, i) => {
+          const r = layer.getBoundingClientRect();
+          const label = labels[i];
+          label.style.top = `${r.top + r.height / 2 - box.top}px`;
+          const line = label.querySelector<HTMLElement>('[data-label-line]')!;
+          line.style.width = `${Math.max(16, box.left - r.right + r.width * 0.12 + 24)}px`;
+        });
+      }
+
+      // ─── Counters ───
+      function showFinalCounts() {
+        document.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
+          el.textContent = Number(el.dataset.count).toLocaleString('es-ES', { useGrouping: 'always' }) + (el.dataset.suffix ?? '');
+        });
+      }
+
+      // ─── Walkthrough ───
+      // One timeline unit per screen. Each crossfade only fills the middle half of its unit, so
+      // wherever the scroll comes to rest a whole screen is showing; the previous screen stays
+      // fully opaque underneath, so nothing dark ever shows through mid-transition.
+      function setupWalk(walkRoot: HTMLElement) {
+        const screens = gsap.utils.toArray<HTMLElement>('[data-screen]', walkRoot);
+        const chapters = gsap.utils.toArray<HTMLElement>('[data-chapter]', walkRoot);
+        const screenNum = walkRoot.querySelector<HTMLElement>('[data-screen-num]')!;
+        let current = -1;
+        const setActive = (index: number) => {
+          if (index === current) return;
+          current = index;
+          screenNum.textContent = String(index + 1).padStart(2, '0');
+          const chapterIndex = Number(screens[index].dataset.chapterIndex);
+          chapters.forEach((el, c) => el.classList.toggle('is-active', c === chapterIndex));
+        };
+
+        const steps = screens.length - 1;
+        gsap.set(screens.slice(1), { autoAlpha: 0 });
+        const walk = gsap.timeline({
+          defaults: { ease: 'power1.inOut', duration: 0.5 },
+          scrollTrigger: {
+            trigger: walkRoot,
+            start: 'top top+=72',
+            end: () => `+=${steps * window.innerHeight * 0.9}`,
+            pin: true,
+            scrub: 1.2,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => setActive(Math.min(steps, Math.floor(self.progress * steps + 0.5))),
+          },
+        });
+        screens.slice(1).forEach((screen, i) => {
+          const from = screen.dataset.kind === 'modal' ? { autoAlpha: 0, y: 12 } : { autoAlpha: 0, scale: 1.02 };
+          walk.fromTo(screen, from, { autoAlpha: 1, y: 0, scale: 1 }, i + 0.25);
+        });
+        walk.to({}, { duration: 0.25 });
+        walk.fromTo(walkRoot.querySelector('[data-progress]'), { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: walk.duration() }, 0);
+        setActive(0);
+      }
+
+      const water = document.querySelector<HTMLCanvasElement>('[data-water]')!;
+
+      if (reducedMotion) {
+        createWater(water, { reducedMotion: true });
+        hero.classList.remove('is-flat');
+        gsap.set(stack, TILT);
+        gsap.set(plane, TURN);
+        layerEls.forEach((el, i) => gsap.set(el, { z: openZ(i) }));
+        gsap.set(labels, { opacity: 1 });
+        requestAnimationFrame(placeLabels);
+        window.addEventListener('resize', placeLabels);
+        showFinalCounts();
+        root.classList.add('is-static');
+      } else {
+        const lenis = new Lenis({ anchors: true });
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => lenis.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+        createWater(water, { reducedMotion: false });
+
+        // Hero entrance: headline lines rise out of their masks while the screen tilts into place.
+        gsap.from('.hero__title .line > span', { yPercent: 105, duration: 1.1, ease: 'expo.out', stagger: 0.09, delay: 0.1 });
+        gsap.from(['.hero__meta', '.hero__cta'], { opacity: 0, y: 12, duration: 0.8, ease: 'power3.out', delay: 0.6, stagger: 0.08 });
+        // At scroll 0 the site reads as a plain, flat screenshot; it only fades up on load.
+        gsap.set(labels, { opacity: 0 });
+        gsap.from('.stage', { opacity: 0, y: 24, duration: 1.2, ease: 'expo.out', delay: 0.3 });
+
+        // Scroll: the flat screen tilts into the isometric plane, then the stack opens, each label
+        // arriving as its layer clears the one above. Scrolling back to the top reverses all of it.
+        const mm = gsap.matchMedia();
+        mm.add({ desktop: '(min-width: 801px)', mobile: '(max-width: 800px)' }, (ctx) => {
+          const isDesktop = ctx.conditions?.desktop;
+          const tl = gsap.timeline({
+            defaults: { ease: 'none' },
+            scrollTrigger: {
+              trigger: '[data-hero]',
+              start: 'top top',
+              end: isDesktop ? '+=280%' : '+=200%',
+              pin: '.hero__pin',
+              scrub: true,
+              invalidateOnRefresh: true,
+              onUpdate: (self) => {
+                hero.classList.toggle('is-flat', self.progress < 0.001);
+                placeLabels();
+              },
+              onRefresh: placeLabels,
+            },
+          });
+          tl.fromTo(stack, { rotateX: 0, scale: 1 }, { ...TILT, duration: 1, ease: 'power2.inOut' }, 0);
+          tl.fromTo(plane, { rotateZ: 0 }, { ...TURN, duration: 1, ease: 'power2.inOut' }, 0);
+          layerEls.forEach((el, i) => {
+            tl.fromTo(el, { z: 0 }, { z: () => openZ(i), duration: 1.4, ease: 'power3.out' }, 0.8);
+          });
+          labels.forEach((label, i) => {
+            tl.fromTo(label, { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.35, ease: 'power2.out' }, 1.05 + i * 0.22);
+          });
+          tl.to('.hero__copy', { opacity: 0.25, duration: 0.6 }, 2);
+          tl.to({}, { duration: 0.6 });
+
+          // Walkthroughs: on desktop each browser frame pins and scroll plays its screens; on
+          // phones they are native swipe carousels instead (see ProductWalk's CSS).
+          if (!isDesktop) return;
+          document.querySelectorAll<HTMLElement>('[data-walk]').forEach(setupWalk);
+        });
+
+        // Figures count up once, the first time they come into view.
+        document.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
+          const target = Number(el.dataset.count);
+          const suffix = el.dataset.suffix ?? '';
+          const counter = { value: 0 };
+          gsap.to(counter, {
+            value: target,
+            duration: 1.6,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+            onUpdate: () => (el.textContent = Math.round(counter.value).toLocaleString('es-ES', { useGrouping: 'always' }) + suffix),
+          });
+        });
+
+        window.addEventListener('load', () => ScrollTrigger.refresh());
+      }
+
+      // ─── Administrable demo ───
+      const editor = document.querySelector<HTMLFormElement>('[data-editor]')!;
+      const status = document.querySelector<HTMLElement>('[data-status]')!;
+      const outTitle = document.querySelector<HTMLElement>('[data-out="title"]')!;
+      const outSubtitle = document.querySelector<HTMLElement>('[data-out="subtitle"]')!;
+      const outImage = document.querySelector<HTMLImageElement>('[data-out="image"]')!;
+
+      function flash(el: HTMLElement) {
+        if (reducedMotion) return;
+        gsap.fromTo(el, { backgroundColor: 'rgba(245, 166, 35, 0.22)' }, { backgroundColor: 'rgba(245, 166, 35, 0)', duration: 0.9, ease: 'power2.out' });
+      }
+
+      editor.addEventListener('input', (event) => {
+        const field = event.target as HTMLInputElement;
+        status.textContent = 'Cambios sin publicar';
+        if (field.name === 'title') {
+          outTitle.textContent = field.value || ' ';
+          flash(outTitle);
+        } else if (field.name === 'subtitle') {
+          outSubtitle.textContent = field.value || ' ';
+          flash(outSubtitle);
+        } else if (field.name === 'image') {
+          if (reducedMotion) {
+            outImage.src = field.value;
+            return;
+          }
+          gsap.to(outImage, {
+            opacity: 0,
+            scale: 1.03,
+            duration: 0.25,
+            ease: 'power2.in',
+            onComplete: () => {
+              outImage.src = field.value;
+              gsap.fromTo(outImage, { opacity: 0, scale: 1.03 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'expo.out' });
+            },
+          });
+        }
+      });
+
+      editor.addEventListener('submit', (event) => {
+        event.preventDefault();
+        status.textContent = 'Publicado ✓ La web ya muestra los cambios.';
+        if (!reducedMotion) gsap.fromTo('[data-preview]', { boxShadow: '0 0 0 1px rgba(245,166,35,0.9)' }, { boxShadow: '0 0 0 1px rgba(245,166,35,0)', duration: 1.2 });
+      });
+    </script>
+
+    <style>
+      body {
+        margin: 0;
+        background: var(--color-bg);
+        color: var(--color-ink);
+        font-family: var(--font-display);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      ::selection {
+        background: var(--color-accent);
+        color: var(--color-bg);
+      }
+
+      .mono {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.02em;
+      }
+
+      .dim {
+        color: var(--color-ink-dim);
+      }
+
+      .wrap {
+        max-width: 84rem;
+        margin-inline: auto;
+        padding-inline: var(--content-pad);
+      }
+
+      .display {
+        font-weight: 300;
+        font-size: clamp(2.6rem, 6vw, 5.5rem);
+        line-height: 0.98;
+        letter-spacing: -0.035em;
+        margin: 0 0 1.25rem;
+      }
+
+      .lead {
+        font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+        line-height: 1.5;
+        font-weight: 300;
+        max-width: 38rem;
+        margin: 0;
+      }
+
+      .section {
+        padding-block: clamp(6rem, 14vh, 10rem);
+      }
+
+      /* ─── Top bar ─── */
+      .bar {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 20;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.1rem var(--content-pad);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
+        border-bottom: 1px solid var(--color-rule);
+        background: color-mix(in srgb, var(--color-bg) 82%, transparent);
+        backdrop-filter: blur(8px);
+      }
+
+      .bar__name {
+        color: var(--color-ink);
+      }
+
+      /* ─── Hero ─── */
+      .hero__pin {
+        position: relative;
+        height: 100vh;
+        height: 100svh;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: minmax(17rem, 0.75fr) minmax(0, 1.9fr) 12rem;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 6rem var(--content-pad) 2rem;
+        box-sizing: border-box;
+      }
+
+      .hero__title {
+        font-weight: 300;
+        /* Sized to its own column so each line stays whole ("Lo que se ve," never splits). */
+        font-size: clamp(2.4rem, 18cqi, 5.6rem);
+        line-height: 1;
+        letter-spacing: -0.04em;
+        margin: 0 0 2rem;
+      }
+
+      .hero__title .line {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        padding-bottom: 0.08em;
+      }
+
+      .hero__title .line > span {
+        display: block;
+      }
+
+      .hero__meta {
+        color: var(--color-ink);
+        max-width: 26rem;
+        line-height: 1.7;
+        margin: 0 0 1.5rem;
+      }
+
+      .hero__water {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .hero__copy {
+        position: relative;
+        container-type: inline-size;
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .stage {
+        position: relative;
+        grid-column: 2 / 4;
+        grid-row: 1;
+        perspective: 3000px;
+        display: grid;
+        place-items: center;
+        height: 100%;
+        min-height: 0;
+      }
+
+      .stack {
+        position: relative;
+        width: min(62vw, 1200px, (100vh - 8rem) * 1.8);
+        aspect-ratio: 2400 / 1313;
+        transform-style: preserve-3d;
+      }
+
+      .plane {
+        position: absolute;
+        inset: 0;
+        transform-style: preserve-3d;
+      }
+
+      /* Scroll 0: no 3D context at all, so the screenshot renders as a plain, crisp image. */
+      .is-flat .stage {
+        perspective: none;
+      }
+
+      .is-flat .stack,
+      .is-flat .plane {
+        transform-style: flat;
+      }
+
+      .is-flat .layer {
+        backface-visibility: visible;
+      }
+
+      .layer {
+        position: absolute;
+        inset: 0;
+        border-radius: 6px;
+        overflow: hidden;
+        backface-visibility: hidden;
+      }
+
+      .layer--shot {
+        background: #fff;
+        box-shadow: 0 40px 60px -30px rgb(0 0 0 / 0.7);
+      }
+
+      .layer--shot img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top left;
+        display: block;
+      }
+
+      .layer--api,
+      .layer--db {
+        background: color-mix(in srgb, var(--color-bg-raised) 94%, transparent);
+        border: 1px solid #2f2f36;
+        font-family: var(--font-mono);
+        color: var(--color-accent);
+        font-size: clamp(0.5rem, 0.95vw, 0.85rem);
+      }
+
+      .layer--api {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        gap: 12%;
+      }
+
+      .api__core {
+        border: 1px solid var(--color-accent);
+        padding: 0.9em 2.4em;
+        border-radius: 3px;
+        text-align: center;
+        display: grid;
+        gap: 0.3em;
+      }
+
+      .api__core small {
+        color: var(--color-ink-dim);
+        font-size: 0.8em;
+      }
+
+      .api__ports {
+        display: grid;
+        grid-template-columns: repeat(4, auto);
+        gap: 1.4em;
+      }
+
+      .api__ports span,
+      .db__tables span {
+        border: 1px solid var(--color-accent-dim);
+        padding: 0.7em 0.9em;
+        border-radius: 3px;
+        white-space: nowrap;
+      }
+
+      .layer--db {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        gap: 10%;
+      }
+
+      .db__name {
+        color: var(--color-ink);
+        letter-spacing: 0.08em;
+      }
+
+      .db__tables {
+        display: grid;
+        grid-template-columns: repeat(4, auto);
+        gap: 1.4em;
+      }
+
+      .labels {
+        position: relative;
+        grid-column: 3;
+        grid-row: 1;
+        pointer-events: none;
+        align-self: stretch;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .label {
+        position: absolute;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        transform: translateY(-50%);
+        font-family: var(--font-mono);
+      }
+
+      .label__line {
+        position: absolute;
+        right: 100%;
+        height: 1px;
+        background: var(--color-accent);
+        margin-right: -0.5rem;
+      }
+
+      .label__line::before {
+        content: '';
+        position: absolute;
+        left: -3px;
+        top: -3px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--color-accent);
+      }
+
+      .label__text {
+        display: grid;
+        gap: 0.2rem;
+        padding-left: 0.75rem;
+      }
+
+      .label__name {
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+      }
+
+      .label__note {
+        font-size: 0.7rem;
+        color: var(--color-ink-dim);
+      }
+
+      /* ─── Projects: intro → walkthrough → closing figure ─── */
+      .project {
+        padding-bottom: clamp(4rem, 10vh, 7rem);
+      }
+
+      .project__intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+        gap: 2rem;
+        align-items: end;
+        margin-bottom: clamp(2rem, 6vh, 4rem);
+      }
+
+      .project__intro .mono {
+        margin: 0;
+      }
+
+      .project__outro {
+        margin-top: clamp(2rem, 6vh, 4rem);
+      }
+
+      .figure {
+        display: grid;
+        grid-template-columns: minmax(9rem, 14rem) 1fr;
+        gap: 1.75rem;
+        align-items: center;
+        padding-block: 1.75rem;
+        border-block: 1px solid var(--color-rule);
+      }
+
+      .figure__value {
+        font-weight: 300;
+        font-size: clamp(2.4rem, 4vw, 3.6rem);
+        letter-spacing: -0.03em;
+        color: var(--color-accent);
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+      }
+
+      .figure__text {
+        display: grid;
+        gap: 0.6rem;
+      }
+
+      .figure__title {
+        font-weight: 500;
+        font-size: 1.1rem;
+      }
+
+      .figure__tags {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .figure__tags li {
+        font-size: 0.72rem;
+        color: var(--color-ink-dim);
+        border: 1px solid var(--color-rule);
+        border-radius: 2px;
+        padding: 0.25em 0.7em;
+      }
+
+      /* ─── Demo ─── */
+      .demo__title {
+        max-width: 14ch;
+      }
+
+      .demo__lead {
+        margin-bottom: 3.5rem;
+      }
+
+      .demo__grid {
+        display: grid;
+        grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+        gap: clamp(1.5rem, 4vw, 3.5rem);
+        align-items: start;
+      }
+
+      .editor {
+        display: grid;
+        gap: 1.4rem;
+        padding: 1.5rem;
+        border: 1px solid var(--color-rule);
+        background: var(--color-bg-raised);
+        border-radius: 4px;
+      }
+
+      .editor__title {
+        margin: 0;
+        color: var(--color-ink-dim);
+      }
+
+      .field {
+        display: grid;
+        gap: 0.5rem;
+        border: 0;
+        padding: 0;
+        margin: 0;
+      }
+
+      .field > .mono,
+      .field legend {
+        color: var(--color-ink-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.7rem;
+        padding: 0;
+        margin-bottom: 0.5rem;
+      }
+
+      .field input[type='text'] {
+        font: inherit;
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--color-ink);
+        background: var(--color-bg);
+        border: 1px solid var(--color-rule);
+        border-radius: 3px;
+        padding: 0.75rem 0.8rem;
+        caret-color: var(--color-accent);
+      }
+
+      .field input[type='text']:focus {
+        outline: none;
+        border-color: var(--color-accent);
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.6rem;
+      }
+
+      .swatch {
+        display: grid;
+        gap: 0.35rem;
+        cursor: pointer;
+      }
+
+      .swatch input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .swatch img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        object-position: top left;
+        border-radius: 3px;
+        border: 1px solid var(--color-rule);
+        transition: border-color 0.2s ease, opacity 0.2s ease;
+        opacity: 0.6;
+      }
+
+      .swatch span {
+        font-size: 0.68rem;
+        color: var(--color-ink-dim);
+      }
+
+      .swatch input:checked + img {
+        border-color: var(--color-accent);
+        opacity: 1;
+      }
+
+      .swatch input:focus-visible + img {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .publish {
+        justify-self: start;
+        background: transparent;
+        color: var(--color-accent);
+        border: 1px solid var(--color-accent);
+        border-radius: 2px;
+        padding: 0.7rem 1.1rem;
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+      }
+
+      .publish:hover {
+        background: var(--color-accent);
+        color: var(--color-bg);
+      }
+
+      .editor__status {
+        margin: 0;
+        min-height: 1.2em;
+        color: var(--color-accent);
+      }
+
+      .preview {
+        border: 1px solid var(--color-rule);
+        border-radius: 6px;
+        overflow: hidden;
+        background: #f6f4f0;
+        color: #1a1a1a;
+      }
+
+      .preview__bar {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.7rem 0.9rem;
+        background: #e9e6e0;
+      }
+
+      .preview__bar {
+        --light-idle: #cfcac2;
+      }
+
+      .preview__bar em {
+        font-style: normal;
+        margin-left: 0.8rem;
+        color: #77736c;
+        font-size: 0.72rem;
+      }
+
+      .preview__page {
+        padding: clamp(1.25rem, 3vw, 2.5rem);
+        display: grid;
+        gap: 1rem;
+      }
+
+      .preview__nav {
+        display: flex;
+        gap: 1.4rem;
+        font-size: 0.72rem;
+        color: #55524c;
+        margin-bottom: 1rem;
+      }
+
+      .preview__nav b {
+        margin-right: auto;
+        color: #1a1a1a;
+      }
+
+      .preview__title {
+        font-weight: 300;
+        font-size: clamp(1.8rem, 3.6vw, 3.2rem);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+        margin: 0;
+        border-radius: 3px;
+        overflow-wrap: anywhere;
+      }
+
+      .preview__subtitle {
+        margin: 0;
+        color: #55524c;
+        font-size: 1rem;
+        border-radius: 3px;
+      }
+
+      .preview__media {
+        margin-top: 0.75rem;
+        border-radius: 4px;
+        overflow: hidden;
+        aspect-ratio: 16 / 8;
+        background: #ddd;
+      }
+
+      .preview__media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top left;
+        display: block;
+      }
+
+      /* ─── Close ─── */
+      .close {
+        border-top: 1px solid var(--color-rule);
+      }
+
+      .close__title {
+        margin-bottom: 2rem;
+      }
+
+      .close__links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem 2.5rem;
+        font-size: 0.95rem;
+        margin: 0 0 4rem;
+      }
+
+      a {
+        color: var(--color-accent);
+        text-decoration: none;
+      }
+
+      a:hover,
+      a:focus-visible {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 3px;
+      }
+
+      /* ─── Mobile ─── */
+      @media (max-width: 800px) {
+        .hero__pin {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto minmax(0, 1fr) auto;
+          padding-top: 4.75rem;
+          gap: 0.5rem;
+        }
+
+        .hero__copy,
+        .stage {
+          grid-column: 1;
+          grid-row: auto;
+        }
+
+        .hero__title {
+          font-size: clamp(2.4rem, 11vw, 3.4rem);
+          margin-bottom: 1rem;
+        }
+
+        .hero__meta {
+          margin-bottom: 0.5rem;
+        }
+
+        .hero__cta {
+          display: none;
+        }
+
+        .stack {
+          width: min(86vw, (100svh - 22rem) * 1.5);
+        }
+
+        .labels {
+          display: none;
+        }
+
+        .project__intro,
+        .demo__grid {
+          grid-template-columns: 1fr;
+        }
+
+        .figure {
+          grid-template-columns: 1fr;
+          gap: 0.75rem;
+        }
+
+        .api__ports,
+        .db__tables {
+          grid-template-columns: repeat(2, auto);
+          gap: 0.8em;
+        }
+      }
+    </style>
+  </body>
+</html>
