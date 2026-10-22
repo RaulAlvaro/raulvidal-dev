@@ -1,0 +1,590 @@
+---
+// The hero's exploded stack: a generic product site and the system under it, drawn in HTML so
+// every layer stays crisp and can move. The page script drives the 3D (tilt, spread, beams,
+// lifts); this file owns the content and how each layer looks.
+//
+// Layers are indexed top-down (0 = what the visitor sees) but written bottom-first: DOM order is
+// paint order, so the site paints on top while the stack is flat.
+
+const beams = [
+  { x: '22%', y: '70%' },
+  { x: '50%', y: '42%' },
+  { x: '78%', y: '64%' },
+];
+const endpoints = ['GET /pedidos', 'GET /clientes', 'POST /inventario', 'Auth · JWT'];
+const tables = [
+  { name: 'pedidos', rows: 4 },
+  { name: 'clientes', rows: 3 },
+  { name: 'inventario', rows: 4 },
+  { name: 'usuarios', rows: 3 },
+];
+const pages = ['Inicio', 'Funcionalidades', 'Precios'];
+const modules = [
+  { name: 'Pedidos', note: '128 este mes' },
+  { name: 'Clientes', note: '46 activos' },
+  { name: 'Inventario', note: '92% en stock' },
+];
+const kpis = [
+  { label: 'Pedidos', value: '128' },
+  { label: 'Clientes', value: '46' },
+  { label: 'Stock', value: '92%' },
+];
+// Weekly orders, as bar heights in %.
+const bars = [38, 52, 46, 64, 58, 76, 88];
+---
+
+<div class="stage">
+  <div class="stack" data-stack>
+    <div class="plane" data-plane>
+      <!-- Data beams stand on the database layer and rise through the stack once it opens. -->
+      {beams.map((beam, i) => (
+        <span class="beam" data-beam style={`--x: ${beam.x}; --y: ${beam.y}; --delay: ${i * -0.8}s`}>
+          <i></i><i></i><i></i>
+        </span>
+      ))}
+
+      <div class="layer layer--data" data-layer="3">
+        <p class="layer__title">PostgreSQL</p>
+        <div class="tables">
+          {tables.map((table, t) => (
+            <div class="table" style={`--t: ${t}`}>
+              <b>{table.name}</b>
+              {Array.from({ length: table.rows }, (_, r) => <span style={`--r: ${r}`}></span>)}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="layer layer--api" data-layer="2">
+        <p class="layer__title">API · Node.js</p>
+        <div class="endpoints">
+          {endpoints.map((endpoint, e) => <span style={`--e: ${e}`}>{endpoint}</span>)}
+        </div>
+      </div>
+
+      <div class="layer layer--cms" data-layer="1">
+        <aside class="cms__side">
+          <b>panel</b>
+          <span class="is-on">Páginas</span>
+          <span>Módulos</span>
+          <span>Usuarios</span>
+        </aside>
+        <div class="cms__main">
+          <p class="cms__label">Titular</p>
+          <p class="cms__field">Todo tu negocio, en un solo panel.<i></i></p>
+          <p class="cms__label">Páginas</p>
+          {pages.map((page) => (
+            <p class="cms__row"><span>{page}</span><em>Publicado</em></p>
+          ))}
+        </div>
+      </div>
+
+      <div class="layer layer--site" data-layer="0">
+        <nav class="site__nav">
+          <b>tu marca</b>
+          <span>Producto</span>
+          <span>Precios</span>
+          <span>Contacto</span>
+          <em data-lift>Probar gratis</em>
+        </nav>
+        <div class="site__hero">
+          <div class="site__copy" data-lift>
+            <p class="site__title">Todo tu negocio, en un solo panel.</p>
+            <p class="site__text">Pedidos, clientes e inventario al día, desde cualquier lugar.</p>
+            <span class="site__cta">Empezar</span>
+          </div>
+          <div class="site__dash" data-lift>
+            <p class="dash__head">Resumen <span>· esta semana</span></p>
+            <div class="dash__kpis">
+              {kpis.map((kpi) => (
+                <div class="dash__kpi"><span>{kpi.label}</span><b>{kpi.value}</b></div>
+              ))}
+            </div>
+            <div class="dash__chart">
+              {bars.map((h, i) => <span style={`--h: ${h}%`} class={i === bars.length - 1 ? 'is-now' : ''}></span>)}
+            </div>
+          </div>
+        </div>
+        <div class="site__cards">
+          {modules.map((module) => (
+            <div class="site__card" data-lift>
+              <span class="site__thumb"></span>
+              <b>{module.name}</b>
+              <span>{module.note}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .stage {
+    position: relative;
+    perspective: 3000px;
+    display: grid;
+    place-items: center;
+    height: 100%;
+    min-height: 0;
+  }
+
+  /* --u is 1% of the stack's width (set by the page script) so layer content scales with it. */
+  .stack {
+    --u: 10px;
+    position: relative;
+    width: min(62vw, 1200px, (100vh - 8rem) * 1.8);
+    aspect-ratio: 16 / 9;
+    transform-style: preserve-3d;
+  }
+
+  .plane {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  /* Scroll 0: no 3D context at all, so the flat site renders pixel for pixel. */
+  :global(.is-flat) .stage {
+    perspective: none;
+  }
+
+  :global(.is-flat) .stack,
+  :global(.is-flat) .plane,
+  :global(.is-flat) .layer--site {
+    transform-style: flat;
+  }
+
+  .layer {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+
+  .layer__title {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: calc(var(--u) * 1.2);
+    letter-spacing: 0.08em;
+    color: var(--color-ink);
+  }
+
+  /* ─── Site (what the visitor sees) ─── */
+  .layer--site {
+    transform-style: preserve-3d;
+    background: #f3f1ec;
+    color: #1b1b1b;
+    padding: calc(var(--u) * 2.2) calc(var(--u) * 3);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: calc(var(--u) * 2);
+    box-shadow: 0 40px 60px -30px rgb(0 0 0 / 0.7);
+    font-family: var(--font-display);
+  }
+
+  .site__nav {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--u) * 2.2);
+    font-size: calc(var(--u) * 1.15);
+    color: #55524c;
+  }
+
+  .site__nav b {
+    margin-right: auto;
+    color: #1b1b1b;
+    font-size: calc(var(--u) * 1.5);
+    letter-spacing: -0.02em;
+  }
+
+  .site__nav em {
+    font-style: normal;
+    background: #1b1b1b;
+    color: #f3f1ec;
+    padding: 0.5em 1.2em;
+    border-radius: 99px;
+  }
+
+  .site__hero {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: calc(var(--u) * 3);
+    align-items: center;
+    min-height: 0;
+  }
+
+  .site__title {
+    margin: 0 0 calc(var(--u) * 1.4);
+    font-weight: 300;
+    font-size: calc(var(--u) * 4.6);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .site__text {
+    margin: 0 0 calc(var(--u) * 2);
+    font-size: calc(var(--u) * 1.3);
+    color: #55524c;
+    max-width: 26ch;
+  }
+
+  .site__cta {
+    display: inline-block;
+    font-size: calc(var(--u) * 1.15);
+    background: var(--color-accent);
+    color: #1b1b1b;
+    padding: 0.6em 1.4em;
+    border-radius: 99px;
+  }
+
+  /* A small live dashboard: the product's own UI as the hero visual. */
+  .site__dash {
+    align-self: center;
+    display: grid;
+    gap: calc(var(--u) * 1.4);
+    padding: calc(var(--u) * 1.8);
+    background: #fff;
+    border-radius: calc(var(--u) * 1.2);
+    box-shadow: 0 calc(var(--u) * 1.6) calc(var(--u) * 3) calc(var(--u) * -1.2) rgb(0 0 0 / 0.25);
+  }
+
+  .dash__head {
+    margin: 0;
+    font-size: calc(var(--u) * 1.2);
+    font-weight: 500;
+  }
+
+  .dash__head span {
+    font-weight: 400;
+    color: #8a857c;
+  }
+
+  .dash__kpis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: calc(var(--u) * 0.8);
+  }
+
+  .dash__kpi {
+    display: grid;
+    gap: calc(var(--u) * 0.2);
+    padding: calc(var(--u) * 0.8) calc(var(--u) * 1);
+    background: #f3f1ec;
+    border-radius: calc(var(--u) * 0.6);
+    font-size: calc(var(--u) * 0.95);
+    color: #8a857c;
+  }
+
+  .dash__kpi b {
+    font-weight: 400;
+    font-size: calc(var(--u) * 2.2);
+    letter-spacing: -0.03em;
+    color: #1b1b1b;
+  }
+
+  .dash__chart {
+    display: flex;
+    align-items: end;
+    gap: calc(var(--u) * 0.7);
+    height: calc(var(--u) * 8);
+  }
+
+  .dash__chart span {
+    flex: 1;
+    height: var(--h);
+    border-radius: calc(var(--u) * 0.3) calc(var(--u) * 0.3) 0 0;
+    background: #dcd8d0;
+  }
+
+  .dash__chart .is-now {
+    background: var(--color-accent);
+  }
+
+  .site__cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: calc(var(--u) * 1.6);
+  }
+
+  .site__card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: calc(var(--u) * 1);
+    padding: calc(var(--u) * 1) calc(var(--u) * 1.2);
+    background: #fff;
+    border-radius: calc(var(--u) * 0.8);
+    font-size: calc(var(--u) * 1.1);
+    box-shadow: 0 1px 0 rgb(0 0 0 / 0.06);
+  }
+
+  .site__card span:last-child {
+    color: #8a857c;
+  }
+
+  .site__thumb {
+    width: calc(var(--u) * 2.6);
+    aspect-ratio: 1;
+    border-radius: calc(var(--u) * 0.5);
+    background: #1b1b1b;
+  }
+
+  /* ─── CMS (what the client edits) ─── */
+  .layer--cms {
+    background: #fbfaf8;
+    color: #2a2a2a;
+    display: grid;
+    grid-template-columns: 22% 1fr;
+    overflow: hidden;
+    box-shadow: 0 40px 60px -30px rgb(0 0 0 / 0.7);
+    font-size: calc(var(--u) * 1.15);
+  }
+
+  .cms__side {
+    display: grid;
+    align-content: start;
+    gap: calc(var(--u) * 1.1);
+    padding: calc(var(--u) * 2.2) calc(var(--u) * 1.8);
+    background: #1e1e22;
+    color: #9a9aa2;
+  }
+
+  .cms__side b {
+    color: #fff;
+    margin-bottom: calc(var(--u) * 1);
+    font-size: calc(var(--u) * 1.4);
+  }
+
+  .cms__side .is-on {
+    color: var(--color-accent);
+  }
+
+  .cms__main {
+    padding: calc(var(--u) * 2.2) calc(var(--u) * 2.6);
+    display: grid;
+    align-content: start;
+    gap: calc(var(--u) * 0.8);
+  }
+
+  .cms__label {
+    margin: calc(var(--u) * 0.6) 0 0;
+    font-family: var(--font-mono);
+    font-size: calc(var(--u) * 0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8a857c;
+  }
+
+  .cms__field,
+  .cms__row {
+    margin: 0;
+    padding: calc(var(--u) * 0.9) calc(var(--u) * 1.1);
+    border: 1px solid #e3e0da;
+    border-radius: calc(var(--u) * 0.4);
+    background: #fff;
+  }
+
+  .cms__field {
+    border-color: var(--color-accent);
+  }
+
+  /* Blinking caret: the client is mid-edit. */
+  .cms__field i {
+    display: inline-block;
+    width: 1px;
+    height: 1.1em;
+    margin-left: 2px;
+    vertical-align: middle;
+    background: var(--color-accent);
+    animation: caret 1.1s steps(1) infinite;
+  }
+
+  .cms__row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .cms__row em {
+    font-style: normal;
+    font-size: 0.85em;
+    color: #2f9e6a;
+  }
+
+  /* ─── API and data (dark schematic layers) ─── */
+  .layer--api,
+  .layer--data {
+    background: color-mix(in srgb, var(--color-bg-raised) 94%, transparent);
+    border: 1px solid #2f2f36;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: calc(var(--u) * 3.2);
+    font-family: var(--font-mono);
+    font-size: calc(var(--u) * 1.1);
+    color: var(--color-accent);
+  }
+
+  .endpoints {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: calc(var(--u) * 1.6);
+  }
+
+  .endpoints span {
+    padding: 0.8em 1em;
+    border: 1px solid var(--color-accent-dim);
+    border-radius: 3px;
+    white-space: nowrap;
+    animation: request 2.4s ease-in-out infinite;
+    animation-delay: calc(var(--e) * -0.6s);
+  }
+
+  .tables {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: calc(var(--u) * 1.6);
+    width: 82%;
+  }
+
+  .table {
+    display: grid;
+    gap: calc(var(--u) * 0.45);
+    padding: calc(var(--u) * 0.9);
+    border: 1px solid var(--color-accent-dim);
+    border-radius: 3px;
+  }
+
+  .table b {
+    font-weight: 400;
+    margin-bottom: calc(var(--u) * 0.3);
+  }
+
+  .table span {
+    height: calc(var(--u) * 0.7);
+    border-radius: 2px;
+    background: #2a2a30;
+    animation: row-read 3.2s ease-in-out infinite;
+    animation-delay: calc(var(--t) * -0.7s + var(--r) * -0.35s);
+  }
+
+  /* ─── Data beams ─── */
+  .beam {
+    --beam-h: 300px;
+    position: absolute;
+    left: var(--x);
+    top: calc(var(--y) - var(--beam-h));
+    width: 2px;
+    height: var(--beam-h);
+    margin-left: -1px;
+    transform-origin: 50% 100%;
+    background: linear-gradient(to top, rgb(245 166 35 / 0.05), rgb(245 166 35 / 0.45));
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .beam i {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    border-radius: 50%;
+    background: #ffd08a;
+    box-shadow: 0 0 10px 2px rgb(245 166 35 / 0.75);
+    animation: flow 2.4s linear infinite;
+  }
+
+  .beam i:nth-child(1) {
+    animation-delay: var(--delay);
+  }
+
+  .beam i:nth-child(2) {
+    animation-delay: calc(var(--delay) - 0.8s);
+  }
+
+  .beam i:nth-child(3) {
+    animation-delay: calc(var(--delay) - 1.6s);
+  }
+
+  /* Loops only run while the stack is open (the page toggles .is-flowing on the hero). */
+  .beam i,
+  .endpoints span,
+  .table span {
+    animation-play-state: paused;
+  }
+
+  :global(.is-flowing) .beam i,
+  :global(.is-flowing) .endpoints span,
+  :global(.is-flowing) .table span {
+    animation-play-state: running;
+  }
+
+  @keyframes flow {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    10%,
+    85% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(calc(var(--beam-h) * -1));
+      opacity: 0;
+    }
+  }
+
+  @keyframes request {
+    0%,
+    70%,
+    100% {
+      border-color: var(--color-accent-dim);
+      color: var(--color-accent);
+      background: transparent;
+    }
+    35% {
+      border-color: #ffd08a;
+      color: #ffe2b5;
+      background: rgb(245 166 35 / 0.12);
+    }
+  }
+
+  @keyframes row-read {
+    0%,
+    60%,
+    100% {
+      background: #2a2a30;
+    }
+    30% {
+      background: rgb(245 166 35 / 0.55);
+    }
+  }
+
+  @keyframes caret {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beam i,
+    .endpoints span,
+    .table span,
+    .cms__field i {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 800px) {
+    .stack {
+      width: min(90vw, (100svh - 22rem) * 1.6);
+    }
+
+    .endpoints,
+    .tables {
+      grid-template-columns: repeat(2, auto);
+    }
+  }
+</style>
